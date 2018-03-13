@@ -35,13 +35,14 @@ const group = (label, ...contents) => {
  * Returns a bare input field suitable for use in a form group.
  * Passes its value to a callback, and defaults to required.
  */
-const field = (onValue, attrs = null) => {
+const field = (onValue, attrs = null, tagName = 'input', options = []) => {
   const defaults = {
-    required: true,
-    oninput: m.withAttr('value', onValue)
+    required: true
   }
 
-  return m('input.form-control.mb-1', _.assign(defaults, attrs))
+  defaults[tagName == 'select'?'onchange':'oninput'] = m.withAttr('value', onValue)
+
+  return m(tagName + '.form-control.mb-1', _.assign(defaults, attrs), options)
 }
 
 /**
@@ -49,6 +50,12 @@ const field = (onValue, attrs = null) => {
  */
 const input = (type, onValue, label, required = true) => {
   return group(label, field(onValue, { type, required }))
+}
+
+const select = (options, onValue, label, required = true) => {
+  return group(label, field(onValue, { required }, 'select', options.map(
+    option => m("option", { value: option.value }, option.label)
+  )))
 }
 
 const textInput = _.partial(input, 'text')
@@ -101,6 +108,7 @@ module.exports = {
   passwordInput,
   numberInput,
   emailInput,
+  select,
   clickIcon,
   stateSetter,
   validator,

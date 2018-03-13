@@ -31,6 +31,8 @@ const AssetListPage = require('./views/asset_list')
 const LoginForm = require('./views/login_form')
 const OfferDetailPage = require('./views/offer_detail')
 const OfferListPage = require('./views/offer_list')
+const CreateAssetPage = require('./views/create_asset')
+const CreateHoldingPage = require('./views/create_holding')
 const SignupForm = require('./views/signup_form')
 
 /**
@@ -48,7 +50,9 @@ const Layout = {
 const loggedInNav = () => {
   const links = [
     ['/assets', 'View Assets'],
-    ['/offers', 'View Offers']
+    ['/offers', 'View Offers'],
+    ['/create_asset', 'Create Asset'],
+    ['/create_holding', 'Create Holding']
   ]
   return m(navigation.Navbar, {}, [
     navigation.links(links),
@@ -122,6 +126,8 @@ document.addEventListener('DOMContentLoaded', () => {
     '/logout': { onmatch: logout },
     '/offers': resolve(OfferListPage),
     '/offers/:id': resolve(OfferDetailPage),
+    '/create_asset': resolve(CreateAssetPage),
+    '/create_holding': resolve(CreateHoldingPage),
     '/signup': resolve(SignupForm)
   })
 })

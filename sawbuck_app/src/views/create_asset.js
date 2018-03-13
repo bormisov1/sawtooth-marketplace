@@ -17,52 +17,45 @@
 'use strict'
 
 const m = require('mithril')
-const _ = require('lodash')
 
-const forms = require('../components/forms')
 const api = require('../services/api')
-
-const accountSubmitter = state => e => {
-  e.preventDefault()
-
-  const accountKeys = ['email', 'password', 'label', 'description']
-  const account = _.pick(state, accountKeys)
-
-  api.post('accounts', account)
-    .then(res => {
-      console.log("___res:", res)
-      return api.setAuth(res.authorization)
-    })
-    .then(() => m.route.set('/'))
-    .catch(api.alertError)
-}
+const forms = require('../components/forms')
 
 /**
- * The Form for creating a new Account.
+ * The Form for authorizing an existing user.
  */
-const SignupForm = {
+const CreateAssetForm = {
   view (vnode) {
     const setter = forms.stateSetter(vnode.state)
 
-    return m('.signup-form', [
-      m('form', { onsubmit: accountSubmitter(vnode.state) },
-      m('legend', 'Create Account'),
-      forms.emailInput(setter('email'), 'Email'),
-      forms.passwordInput(setter('password'), 'Password'),
-      forms.textInput(setter('label'), 'Label'),
+    return m('.create-asset-form', [
+      m('form', {
+        onsubmit: (e) => {
+          e.preventDefault()
+          const data = {
+            name: vnode.state.name,
+            description: vnode.state.description,
+            owners: [api.getAuth()]
+          }
+          api.post('assets', data)
+            .then(res => {
+              console.log(res)
+              m.route.set('/assets')
+            })
+            .catch(api.alertError)
+        }
+      },
+      m('legend', 'Create Asset'),
+      forms.textInput(setter('name'), 'Name'),
       forms.textInput(setter('description'), 'Description'),
-      m('.container.text-center',
-        'Or you can ',
-        m('a[href="/login"]',
-          { oncreate: m.route.link },
-          'login with an existing Account')),
       m('.form-group',
         m('.row.justify-content-end.align-items-end',
           m('col-2',
             m('button.btn.btn-primary',
-              'Create Account')))))
+              {'data-toggle': 'modal', 'data-target': '#modal'},
+              'Create')))))
     ])
   }
 }
 
-module.exports = SignupForm
+module.exports = CreateAssetForm

@@ -188,7 +188,6 @@ class MarketplaceState(object):
             state_entries_send,
             self._timeout)
 
-    #                                                           ONLY FUNC NAME CHANGED FOR COMMENTED BELOW
     def get_feedback(self, identifier):
         address = addresser.make_holding_address(feedback_id=identifier)
 

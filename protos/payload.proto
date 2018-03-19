@@ -25,6 +25,7 @@ message TransactionPayload {
         CREATE_ASSET = 3;
         CREATE_HOLDING = 4;
         CREATE_OFFER = 5;
+        CREATE_FEEDBACK = 6;
         ACCEPT_OFFER = 10;
         CLOSE_OFFER = 11;
     }
@@ -35,6 +36,7 @@ message TransactionPayload {
     CreateAsset create_asset = 3;
     CreateHolding create_holding = 4;
     CreateOffer create_offer = 5;
+    CreateFeedback create_feedback = 6;
     AcceptOffer accept_offer = 10;
     CloseOffer close_offer = 11;
 }
@@ -67,6 +69,13 @@ message CreateOffer {
     string target = 6;
     sint64 target_quantity = 7;
     repeated Rule rules = 8;
+}
+
+message CreateFeedback {
+    string id = 1;
+    string asset = 3;
+    string text = 4;
+    uint32 rating = 5;
 }
 
 message AcceptOffer {

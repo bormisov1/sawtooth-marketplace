@@ -19,6 +19,7 @@ from marketplace_processor.protobuf import asset_pb2
 from marketplace_processor.protobuf import holding_pb2
 from marketplace_processor.protobuf import offer_pb2
 from marketplace_processor.protobuf import offer_history_pb2
+from marketplace_processor.protobuf import feedback_pb2
 from marketplace_processor.protobuf import rule_pb2
 
 
@@ -183,6 +184,54 @@ class MarketplaceState(object):
         state_entries_send = {}
         state_entries_send[address] = container.SerializeToString()
 
+        return self._context.set_state(
+            state_entries_send,
+            self._timeout)
+
+    #                                                           ONLY FUNC NAME CHANGED FOR COMMENTED BELOW
+    def get_feedback(self, identifier):
+        address = addresser.make_holding_address(feedback_id=identifier)
+
+        self._state_entries.extend(self._context.get_state(
+            addresses=[address],
+            timeout=self._timeout))
+
+        return self._get_feedback(address=address, identifier=identifier)
+
+    def _get_feedback(self, address, identifier):
+
+        container = _get_feedback_container(self._state_entries, address)
+
+        feedback = None
+        try:
+            feedback = _get_feedback_from_container(container, identifier)
+        except KeyError:
+            # Fine with returning None
+            pass
+        return feedback
+
+    def set_feedback(self,
+                    identifier,
+                    account,
+                    asset,
+                    text,
+                    rating):
+        address = addresser.make_feedback_address(feedback_id=identifier)
+        container = _get_feedback_container(self._state_entries, address)
+
+        try:
+            feedback = _get_feedback_from_container(container, identifier)
+        except KeyError:
+            feedback = container.entries.add()
+
+        feedback.id = identifier
+        feedback.account = account
+        feedback.asset = asset
+        feedback.text = text
+        feedback.rating = rating
+
+        state_entries_send = {}
+        state_entries_send[address] = container.SerializeToString()
         return self._context.set_state(
             state_entries_send,
             self._timeout)
@@ -428,6 +477,26 @@ def _get_holding_from_container(container, holding_id):
         "Holding with id {} is not in container".format(holding_id))
 
 
+
+def _get_feedback_container(state_entries, address):
+    try:
+        entry = _find_in_state(state_entries, address)
+        container = feedback_pb2.FeedbackContainer()
+        container.ParseFromString(entry.data)
+    except KeyError:
+        container = feedback_pb2.FeedbackContainer()
+
+    return container
+
+
+def _get_feedback_from_container(container, feedback_id):
+    for feedback in container.entries:
+        if feedback.id == feedback_id:
+            return feedback
+    raise KeyError(
+        "Feedback with id {} is not in container".format(feedback_id))
+
+
 def _get_asset_container(state_entries, address):
     try:
         entry = _find_in_state(state_entries, address)
@@ -444,6 +513,24 @@ def _get_asset_from_container(container, name):
             return asset
     raise KeyError(
         "Asset with name {} is not in container".format(name))
+
+
+def _get_feedback_container(state_entries, address):
+    try:
+        entry = _find_in_state(state_entries, address)
+        container = feedback_pb2.FeedbackContainer()
+        container.ParseFromString(entry.data)
+    except KeyError:
+        container = feedback_pb2.FeedbackContainer()
+    return container
+
+
+def _get_feedback_from_container(container, asset):
+    for feedback in container.entries:
+        if feedback.asset == asset:
+            return feedback
+    raise KeyError(
+        "Feedback about asset with name {} is not in container".format(asset))
 
 
 def _get_account_container(state_entries, address):

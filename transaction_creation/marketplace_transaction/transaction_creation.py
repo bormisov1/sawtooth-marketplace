@@ -142,6 +142,52 @@ def create_holding(txn_key,
         batch_key=batch_key)
 
 
+def create_feedback(txn_key,
+                    batch_key,
+                    identifier,
+                    asset,
+                    text,
+                    rating):
+    """Create a CreateFeedback txn and wrap it in a batch and list.
+
+    Args:
+        txn_key (sawtooth_signing.Signer): The txn signer key pair.
+        batch_key (sawtooth_signing.Signer): The batch signer key pair.
+        asset (str): The name of the asset which feedback is about.
+        text (str): Text of the feedback.
+        rating (int): Num in [1;5] estimating service/good
+
+    Returns:
+        tuple: List of Batch, signature tuple
+    """
+
+    inputs = [addresser.make_feedback_address(
+                    feedback_id=identifier),
+              addresser.make_account_address(
+                    account_id=txn_key.get_public_key().as_hex()),
+              addresser.make_asset_address(asset_id=asset)]
+
+    outputs = [addresser.make_feedback_address(feedback_id=identifier)]
+
+    feedback_txn = payload_pb2.CreateFeedback(
+        id=identifier,
+        asset=asset,
+        text=text,
+        rating=rating
+    )
+
+    payload = payload_pb2.TransactionPayload(
+        payload_type=payload_pb2.TransactionPayload.CREATE_FEEDBACK,
+        create_feedback=feedback_txn)
+
+    return make_header_and_batch(
+        payload=payload,
+        inputs=inputs,
+        outputs=outputs,
+        txn_key=txn_key,
+        batch_key=batch_key)
+
+
 def create_offer(txn_key,
                  batch_key,
                  identifier,

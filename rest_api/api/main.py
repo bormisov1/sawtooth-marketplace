@@ -39,6 +39,7 @@ from api.authorization import AUTH_BP
 from api.errors import ERRORS_BP
 from api.holdings import HOLDINGS_BP
 from api.offers import OFFERS_BP
+from api.feedbacks import FEEDBACKS_BP
 
 
 LOGGER = logging.getLogger(__name__)
@@ -175,6 +176,7 @@ def main():
     app.blueprint(ERRORS_BP)
     app.blueprint(HOLDINGS_BP)
     app.blueprint(OFFERS_BP)
+    app.blueprint(FEEDBACKS_BP)
 
     load_config(app)
     zmq = ZMQEventLoop()

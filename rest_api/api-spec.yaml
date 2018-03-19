@@ -338,6 +338,61 @@ paths:
         500:
           $ref: '#/responses/500ServerError'
 
+  /feedbacks:
+    post:
+      description: Creates a new Feedback in state
+      security:
+        - AuthToken: []
+      parameters:
+        - name: feedback
+          description: Info for Feedback to add to state
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/NewFeedbackBody'
+      responses:
+        200:
+          description: Success response with the new Feedback
+          schema:
+            $ref: '#/definitions/FeedbackObject'
+        400:
+          $ref: '#/responses/400BadRequest'
+        401:
+          $ref: '#/responses/401Unauthorized'
+        500:
+          $ref: '#/responses/500ServerError'
+
+    get:
+      description: Fetches complete details of all Feedbacks in state
+      responses:
+        200:
+          description: Success response with a list of Feedbacks
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/FeedbackObject'
+        400:
+          $ref: '#/responses/400BadRequest'
+        500:
+          $ref: '#/responses/500ServerError'
+
+  /feedbacks/{name}:
+    parameters:
+      - $ref: '#/parameters/AssetName'
+    get:
+      description: Fetches the details of particular Feedback in state
+      responses:
+        200:
+          description: Success response with the requested Feedback
+          schema:
+            $ref: '#/definitions/FeedbackObject'
+        400:
+          $ref: '#/responses/400BadRequest'
+        404:
+          $ref: '#/responses/404NotFound'
+        500:
+          $ref: '#/responses/500ServerError'
+
 # Reference Definitions
 
 responses:
@@ -710,3 +765,42 @@ definitions:
         items:
           type: string
           example: 02178c1bcdb25407394348f1ff5273adae287d8ea328184546837957e71c7de57a
+
+# Feedbacks
+
+  FeedbackObject:
+    description: Describes a feedback
+    type: object
+    properties:
+      asset:
+        description: Asset name which feedback is about
+        type: string
+        example: Sawbuck
+      text:
+        description: Feedback text
+        type: string
+        example: Cool!
+      rating:
+        description: Number from 1 to 5 estimating service
+        type: integer
+        example: 3
+
+  NewFeedbackBody:
+    description: Details provided to create a new Feedback
+    type: object
+    required:
+      - asset
+      - rating
+    properties:
+      asset:
+        description: Asset name which feedback is about
+        type: string
+        example: Sawbuck
+      text:
+        description: Feedback text
+        type: string
+        example: Cool!
+      rating:
+        description: Number from 1 to 5 estimating service
+        type: integer
+        example: 3

@@ -27,24 +27,29 @@ class OfferHistorySpace(enum.IntEnum):
     START = 0
     STOP = 1
 
-
+# 51 out of 255 left pos for each:
 class AssetSpace(enum.IntEnum):
     START = 1
-    STOP = 50
+    STOP = 52
 
 
 class HoldingSpace(enum.IntEnum):
-    START = 50
-    STOP = 125
+    START = 52
+    STOP = 103
 
 
 class AccountSpace(enum.IntEnum):
-    START = 125
-    STOP = 200
+    START = 103
+    STOP = 154
 
 
 class OfferSpace(enum.IntEnum):
-    START = 200
+    START = 154
+    STOP = 205
+
+
+class FeedbackSpace(enum.IntEnum):
+    START = 205
     STOP = 256
 
 
@@ -55,6 +60,7 @@ class AddressSpace(enum.IntEnum):
     ACCOUNT = 2
     OFFER = 3
     OFFER_HISTORY = 4
+    FEEDBACK = 5
 
     OTHER_FAMILY = 100
 
@@ -116,6 +122,15 @@ def make_offer_address(offer_id):
         OfferSpace.STOP) + full_hash[:62]
 
 
+def make_feedback_address(feedback_id):
+    full_hash = _hash(feedback_id)
+
+    return NS + _compress(
+        full_hash,
+        FeedbackSpace.START,
+        FeedbackSpace.STOP) + full_hash[:62]
+
+
 def _contains(num, space):
     return space.START <= num < space.STOP
 
@@ -141,6 +156,9 @@ def address_is(address):
 
     elif _contains(infix, OfferSpace):
         result = AddressSpace.OFFER
+
+    elif _contains(infix, FeedbackSpace):
+        result = FeedbackSpace.FEEDBACK
     else:
         result = AddressSpace.OTHER_FAMILY
 

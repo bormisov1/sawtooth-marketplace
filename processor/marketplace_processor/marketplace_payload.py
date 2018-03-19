@@ -111,3 +111,18 @@ class MarketplacePayload(object):
         close_offer = payload_pb2.TransactionPayload.CLOSE_OFFER
 
         return self._transaction.payload_type == close_offer
+
+    def create_feedback(self):
+        """Returns the value set in the create_feedback.
+
+        Returns:
+            payload_pb2.CreateFeedback
+        """
+
+        return self._transaction.create_feedback
+
+    def is_create_feedback(self):
+
+        create_feedback = payload_pb2.TransactionPayload.CREATE_FEEDBACK
+
+        return self._transaction.payload_type == create_feedback

@@ -24,6 +24,7 @@ from marketplace_processor.holding import holding_creation
 from marketplace_processor.offer import offer_acceptance
 from marketplace_processor.offer import offer_closure
 from marketplace_processor.offer import offer_creation
+from marketplace_processor.feedback import feedback_creation
 from marketplace_processor.marketplace_payload import MarketplacePayload
 from marketplace_processor.marketplace_state import MarketplaceState
 
@@ -75,6 +76,11 @@ class MarketplaceHandler(TransactionHandler):
         elif payload.is_close_offer():
             offer_closure.handle_close_offer(
                 payload.close_offer(),
+                header=transaction.header,
+                state=state)
+        elif payload.is_create_feedback():
+            feedback_creation.handle_feedback_creation(
+                payload.create_feedback(),
                 header=transaction.header,
                 state=state)
 
